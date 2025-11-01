@@ -42,6 +42,7 @@ from __future__ import annotations
 import contextlib
 import dataclasses
 import io
+import logging
 import subprocess
 import signal
 import textwrap
@@ -311,6 +312,9 @@ class PythonJail:
         self.log_path = self.project_root / "logs" / "bait.log"
         self.fake_flag_path = self.project_root / "data" / "fake_flags" / "fake_flag_2.txt"
         self.timeout_seconds = timeout_seconds
+        self._logger = logging.getLogger("isol8r.pyjail")
+        self._log_error_reported = False
+        self._fake_flag_error_reported = False
         provided_keywords = tuple(banned_keywords) if banned_keywords else ()
         self.banned_keywords = tuple(sorted(set(self.DEFAULT_BANNED_KEYWORDS + provided_keywords)))
         self._ensure_paths()
@@ -332,8 +336,15 @@ class PythonJail:
         """
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         line = f"[{event_type.upper()}] {message.strip()} at {timestamp}"
-        with self.log_path.open("a", encoding="utf-8") as handle:
-            handle.write(line + "\n")
+        try:
+            with self.log_path.open("a", encoding="utf-8") as handle:
+                handle.write(line + "\n")
+        except OSError as exc:
+            if not self._log_error_reported:
+                self._logger.warning(
+                    "Unable to write to bait log '%s': %s", self.log_path, exc
+                )
+                self._log_error_reported = True
 
     # --------------------------------------------------------------- honeypots --
 
@@ -343,7 +354,14 @@ class PythonJail:
         every time to ensure the message stays on-brand and unhelpful.
         """
         payload = "flag{stop_using_imports_bro}"
-        self.fake_flag_path.write_text(payload, encoding="utf-8")
+        try:
+            self.fake_flag_path.write_text(payload, encoding="utf-8")
+        except OSError as exc:
+            if not self._fake_flag_error_reported:
+                self._logger.warning(
+                    "Unable to refresh fake flag '%s': %s", self.fake_flag_path, exc
+                )
+                self._fake_flag_error_reported = True
 
     # --------------------------------------------------------------- analysis --
 
