@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BAIT_LOG="${ISOL8R_BAIT_LOG:-/app/logs/bait.log}"
+mkdir -p "$(dirname "${BAIT_LOG}")" 2>/dev/null || true
+
+printf '[TRAP] User ran troll_strings %q at %s\n' "$*" "$(date '+%Y-%m-%d %H:%M:%S')" >> "${BAIT_LOG}"
+echo "Nope, you'll find nothing but suffering."
