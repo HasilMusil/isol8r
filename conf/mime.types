@@ -1,0 +1,19 @@
+types {
+    text/html                             html htm;
+    text/css                              css;
+    text/javascript                       js;
+    application/javascript                mjs;
+    application/json                      json map;
+    text/plain                            txt log;
+    image/jpeg                            jpeg jpg;
+    image/png                             png;
+    image/gif                             gif;
+    image/svg+xml                         svg svgz;
+    image/webp                            webp;
+    image/x-icon                          ico;
+    audio/mpeg                            mp3;
+    video/mp4                             mp4;
+    application/pdf                       pdf;
+    application/zip                       zip;
+    application/octet-stream              bin exe;
+}
