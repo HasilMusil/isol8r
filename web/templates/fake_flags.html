@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ISOL8R | Totally Legitimate Flags</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #0f141d;
+      color: #f5f9ff;
+      font-family: "Fira Sans", "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 32px;
+    }
+    a {
+      color: #7ed0ff;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .flags {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+      color: #9de8ff;
+    }
+    pre {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 12px;
+      overflow: auto;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <a href="{{ url_for('index') }}">&laquo; Return to Console</a>
+  <h1>Fake Flag Repository</h1>
+  <p>Congratulations, you have discovered the ceremonial pile of decoy flags. Each one is handcrafted to disappoint in new and exciting ways. Logging the fact you opened this page has already occurred, naturally.</p>
+  <div class="flags">
+    {% for item in flags %}
+      <div class="card">
+        <h2>{{ item.name }}</h2>
+        <pre>{{ item.content }}</pre>
+      </div>
+    {% endfor %}
+  </div>
+</body>
+</html>

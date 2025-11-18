@@ -1,0 +1,200 @@
+########## OS CRAP ##########
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+
+# macOS
+*.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+._*
+
+# Linux
+*~ 
+.nfs*
+
+# Windows
+ehthumbs.db
+*.lnk
+
+########## IDEs / EDITORS ##########
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.iml
+out/
+
+# Sublime
+*.sublime-workspace
+*.sublime-project
+
+# Vim / Neovim
+*.swp
+*.swo
+*.swn
+*.un~
+.session
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+########## LANGUAGES & RUNTIMES ##########
+
+## Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log
+.pnp.*
+.cache/
+.nyc_output/
+coverage/
+dist/
+build/
+.env
+.env.*
+
+## Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+ENV/
+env/
+pip-log.txt
+*.log
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+coverage.xml
+
+## Golang
+*.exe
+*.test
+*.out
+*.log
+vendor/
+bin/
+pkg/
+*.cover
+*.prof
+*.pb.go
+
+## Rust
+target/
+Cargo.lock
+*.rs.bk
+
+## C / C++
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.out
+*.a
+*.dylib
+*.lib
+*.idb
+*.pdb
+*.mod
+*.sdf
+*.cache
+
+## Java
+*.class
+*.jar
+*.war
+*.ear
+*.log
+hs_err_pid*
+*.db
+*.sqlite
+
+## Kotlin
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+.gradle/
+build/
+
+########## MISC ##########
+
+# Logs
+*.log
+!logs/
+!logs/bait.log
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.tar
+*.gz
+*.bzip2
+
+# Backup files
+*.bak
+*.tmp
+*.swp
+*.swo
+*.tmp
+*.temp
+
+# Test outputs
+test-output/
+test-results/
+*.profraw
+
+# Coverage
+coverage/
+*.lcov
+*.clover
+*.gcov
+*.gcda
+*.gcno
+*.lst
+*.cov
+
+# Security
+secrets.txt
+credentials.json
+*.pem
+*.key
+*.crt
+
+# Git
+.git/
+.gitignore~
+
+# Temporary
+WRITEUP.md

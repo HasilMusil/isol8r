@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<!-- creds: nope, not here. those overheard logs smell suspicious, though. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ISOL8R | Project Sandtrap Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #11161e;
+      --panel: #1b2330;
+      --accent: #6fd3ff;
+      --warning: #ffb84d;
+      --text: #f0f6ff;
+      --muted: #94a3b8;
+      --positive: #79ffb7;
+      --danger: #ff6b6b;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Fira Sans", "Segoe UI", sans-serif;
+      background: linear-gradient(160deg, var(--bg), #0b0e15 70%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 24px;
+      background: rgba(17, 22, 30, 0.92);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    header h1 {
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    header p {
+      margin: 6px 0 0 0;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      padding: 32px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .panel {
+      background: var(--panel);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .panel h2 {
+      margin-top: 0;
+      color: var(--accent);
+    }
+    form {
+      display: grid;
+      gap: 18px;
+    }
+    label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    input, textarea, button {
+      border-radius: 12px;
+      border: none;
+      padding: 14px 16px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    button {
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: linear-gradient(135deg, var(--accent), #347cce);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      font-weight: 600;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(79, 167, 255, 0.35);
+    }
+    .status {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .status-card {
+      border-radius: 12px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .log-list {
+      margin: 0;
+      padding-left: 18px;
+      max-height: 200px;
+      overflow: auto;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .log-list li {
+      margin-bottom: 6px;
+    }
+    .flash {
+      background: rgba(255, 184, 77, 0.18);
+      border-left: 4px solid var(--warning);
+      padding: 14px 18px;
+      border-radius: 14px;
+      margin: 12px 0;
+      color: var(--warning);
+      font-size: 0.95rem;
+      backdrop-filter: blur(6px);
+    }
+    .error-banner {
+      background: rgba(255, 107, 107, 0.18);
+      border-left: 4px solid var(--danger);
+      padding: 14px 18px;
+      border-radius: 14px;
+      margin-bottom: 18px;
+      color: var(--danger);
+    }
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 32px;
+    }
+    details {
+      border-radius: 12px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ISOL8R :: Project Sandtrap</h1>
+    <p>Sandbox control console. Authorized personnel only. Sandbox powered by 20% sarcasm.</p>
+  </header>
+  <main>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="flash">{{ message|safe }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if error_message %}
+      <div class="error-banner">{{ error_message }}</div>
+    {% endif %}
+
+    {% if user %}
+      <section class="panel">
+        <h2>Session Overview</h2>
+        <div class="status">
+          <div class="status-card">
+            <strong>Operator:</strong> {{ user.display_name }}<br>
+            <strong>Clearance:</strong> {{ user.clearance }}<br>
+            <strong>Favorite Warning:</strong> {{ user.favorite_warning }}<br>
+            <strong>Sarcasm Index:</strong> {{ sarcasm_level }}%
+          </div>
+          <details>
+            <summary>Daily briefing sample (auto-curated chaos)</summary>
+            <ol class="log-list">
+              {% for entry in briefing_sample %}
+                <li>{{ entry }}</li>
+              {% endfor %}
+            </ol>
+          </details>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Run Experiment</h2>
+        <p>Pipe your text into the sandboxed echo utility. Logs are archived, sarcasm levels monitored.</p>
+        <form method="post" action="{{ url_for('run_experiment') }}">
+          <label for="experiment_input">Experiment Input (one line preferred for dramatic effect)</label>
+          <textarea id="experiment_input" name="experiment_input" maxlength="512" placeholder="Enter command-ish content here. The sandbox echoes once and judges twice."></textarea>
+          <button type="submit">Run Experiment</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Logout</h2>
+        <form method="post" action="{{ url_for('logout') }}">
+          <button type="submit" style="background: linear-gradient(135deg, #ff6b6b, #c74242);">End Session</button>
+        </form>
+      </section>
+    {% else %}
+      <section class="panel">
+        <h2>Login Required</h2>
+        <p>State your name (dramatically), enter your credentials (carefully).</p>
+        <form method="post" action="{{ url_for('login') }}">
+          <label for="username">Username</label>
+          <input id="username" name="username" autocomplete="username" placeholder="zigzantares">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••">
+          <button type="submit">Enter Sandbox</button>
+        </form>
+      </section>
+    {% endif %}
+
+    <section class="panel">
+      <h2>Message Admin</h2>
+      {% if user %}
+        <p>Compose messages for the admin desk. They read everything eventually, usually before coffee.</p>
+      {% else %}
+        <p>Guest transmissions accepted here. Anonymous notes go to the same inbox, eventually.</p>
+      {% endif %}
+      <form method="post" action="{{ url_for('message_admin') }}">
+        <label for="admin_message">Admin Message</label>
+        <textarea id="admin_message" name="admin_message" maxlength="768" placeholder="Dear admin, today the bio-hood requested a vacation..."></textarea>
+        <button type="submit">Submit Message</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Operational Overheard Log (Furnished for amusement and compliance)</h2>
+      <p>The following internal notes are archived here because the legal team said &ldquo;transparency builds trust&rdquo; and the comms team called their bluff.</p>
+      <pre style="max-height: 260px; overflow-y: auto; background: rgba(0,0,0,0.25); padding: 18px; border-radius: 12px;">
+[07:00] Morning lights warmed up, so did sarcasm detectors.
+[07:04] Someone labelled the coffee pot as &ldquo;liquid courage&rdquo; again.
+[07:07] Access badge reader coughed politely before admitting staff.
+[07:11] Memo from management: &ldquo;No cloning yourself to skip meetings.&rdquo;
+[07:14] Lab speaker queued ambient whale math jazz.
+[07:18] Reminder posted: &ldquo;Do not photoshop PPE onto selfies.&rdquo;
+[07:22] Observed technician giving pep talk to centrifuge. Centrifuge spun appreciatively.
+[07:25] Elevator refused to stop on floor 3 until complimented.
+[07:27] Here's a question for you: 'spectral-?-?'. This is the thing that smells maybe. Respect HTTP 418.
+[07:29] Ventilation system hummed a suspiciously catchy jingle.
+[07:33] Art department denied request for motivational posters featuring dramatic pipettes.
+[07:36] Someone catalogued pipette tips by vibe. Surprisingly effective.
+[07:39] Cryo unit asked for dental coverage. HR investigating viability.
+[07:42] Sarcasm detectors calibrated to &ldquo;monday tolerance&rdquo;.
+[07:46] Intern discovered server room shrine to duct tape. Shrine unchanged.
+[07:50] Admin inbox auto-sorted messages into &ldquo;urgent&rdquo;, &ldquo;very urgent&rdquo;, and &ldquo;set on fire&rdquo;.
+[07:51] Technician reported that there are Titans inside the Walls.
+[07:55] Whiteboard now titled &ldquo;Plan?&rdquo;. Contents: doodle of double helix wearing shades.
+[08:00] Staff meeting concluded with musical outro from IT.
+[08:01] Memo posted: “No more building nether portals in lab corners. We lost two interns to piglins last week.”
+[08:03] The autoclave politely requested jazz instead of the usual hold music.
+[08:06] Safety officer issued commemorative stickers: &ldquo;I sanitized with enthusiasm.&rdquo;
+[08:09] Drone delivery attempted to deliver to broom closet. Broom closet unimpressed.
+[08:13] Someone added googly eyes to the air sampler. Air sampler blinking smugly.
+[08:16] Reminder: fake flag drawer is for morale only. For real secrets, use the paperwork.
+[08:19] Technician posted note: &ldquo;If you break it, you file the ticket.&rdquo; Note underlined twice.
+[08:23] Fire extinguisher requested a cape. Facilities considering.
+[08:27] Lab plant currently listening to classical to encourage photosynthesis.
+[08:30] Glitter containment status: holding. Barely. Sweep logs updated.
+[08:34] Notebook labelled &ldquo;Do Not Open&rdquo; found. Inside: directions to coffee filters.
+[08:37] Scent diffusers now misting &ldquo;fresh hypothesis&rdquo; aroma.
+[08:41] Someone drew moustache on poster of our founder. CCTV footage 37% dramatic.
+[08:44] Oxygen sensors practicing synchronized blinking.
+[08:48] Reminder to log all admin messages, especially the ridiculous ones.
+[08:52] Lab fridge requested a nap. Denied &mdash; thesis defenses need snacks.
+[08:55] Safety goggles arranged alphabetically. Volunteers applauded.
+[08:58] Laser alignment lasers double-checked themselves (overachievers).
+[09:01] Mission control pinged, asked if we still liked them. We do.
+[09:05] Microwave refused to reheat fish, citing moral objections.
+[09:09] Environmental monitors flagged &ldquo;unusual enthusiasm&rdquo;. Probably the coffee.
+[09:12] HR asked everyone to stop naming the servers after mythical beasts.
+[09:16] Floor buffer doing laps like it owns the place. Let it have this.
+[09:19] Fire drill scheduled, rescheduled, then rescheduled for comedic timing.
+[09:23] Someone recalibrated sarcasm sensors to &ldquo;gentle roasting&rdquo;.
+[09:26] Ventilation shaft refused to accept apology letters regarding glitter infiltration.
+[09:30] The admin desk would like to remind: Please send messages without glitter.
+[09:33] Technician muttered “I got a plan, Arthur” before breaking the pipette rack. No one questioned him.
+[09:37] Airlock whispered &ldquo;hydrate&rdquo; as staff entered. Slightly unsettling.
+[09:40] 3D printer queued secret print job titled &ldquo;surprise llama&rdquo;. Approved for morale.
+[09:44] Conference phone chirped &ldquo;bless you&rdquo; when someone sneezed. Firmware? possessed?
+[09:47] Range hood playing white noise remixes. Acceptable background.
+[09:51] Internal wiki article &ldquo;How to Apologize to Lab Equipment&rdquo; updated.
+[09:54] Admin inbox ping rate: 110 per hour. Coffee drip rate: 100 ml per minute.
+[09:58] Someone attempted to fax a meme. Machine still processing its feelings.
+[10:01] Dry erase markers lined up for inspection. All passed, one smug.
+[10:05] Bioreactor asked for &ldquo;non-judgmental observation&rdquo;. Granted.
+[10:08] Incident report filed: &ldquo;Laser pointer envy.&rdquo; Awaiting narrative.
+[10:12] Break room speaker now loops &ldquo;hold music but make it dramatic.&rdquo;
+[10:15] Freezer door hinge squeak harmonized with fluorescent light buzz.
+[10:19] Reminder posted on door: &ldquo;Laugh at your own jokes, just not near sterile media.&rdquo;
+[10:22] Printer jam resolved after heartfelt apology letter.
+[10:27] Reminder: The cake in break room is a known anomaly. Approach with skepticism and a fork.
+[10:26] Risk register entry 142: &ldquo;Someone names new organism after themselves.&rdquo;
+[10:29] Drift reports show humidity staying in its lane. Good humidity.
+[10:33] Observed &ldquo;flag&rdquo; scribbles on sticky notes. Logged to bait file with gusto.
+[10:36] Message queue backlog down to 18 items. Alert the parade team.
+[10:40] Laser safety officer distributed brochures titled &ldquo;Eyes are friends!&rdquo;
+[10:43] Someone tuned the vent system to play whale math jazz. Again.
+[10:47] The sarcasm gauge tapped out at 101%. Recalibrated to &ldquo;meh&rdquo;.
+[10:50] Lab coats in dryer finished spin cycle. Folded themselves. Witchcraft? Efficiency? both.
+[10:54] Visitor badge dispenser told a knock-knock joke. Security graded it C+.
+[10:57] Fresh reminder: Log everything. Including this reminder. Especially this reminder.
+[10:59] Crowbar found in lab storage. Catalogued under “just in case”.
+[11:01] Coffee filter inventory replenished with artisanal filters. Fancy caffeine inbound.
+[11:04] Laser lab posted schedule titled &ldquo;Dramatic Laser Hour&rdquo;. Attendance mandatory.
+[11:08] Admin noticed messages without timestamps. Response: suspicious eyebrow.
+[11:11] Break room plant now nominated for &ldquo;Most Improved morale booster&rdquo;.
+[11:13] Someone carved “I will become the Pirate King” into the fume hood. No witnesses, only respect.
+[11:15] Someone suggested &ldquo;sarcasm budget&rdquo; for the quarter. Finance intrigued.
+[11:18] Vent 3B rattled. Threatened with screwdriver. Calmed down immediately.
+[11:22] Notification: &ldquo;Bait log appended. Please act surprised.&rdquo;
+[11:25] Ops discovered unauthorized motivational fortune cookies. Delicious evidence confiscated.
+[11:29] Spectrometer once again insisted on being called &ldquo;Spectrosaurus.&rdquo;
+[11:32] Lab playlist rotated to &ldquo;Focus with Synthwave.&rdquo; Productivity soared 3%.
+[11:36] Message queue down to 12. Parade scheduled tentatively.
+[11:39] Admin wrote &ldquo;Stop messaging yourself, Zig.&rdquo; Post-it applied to monitor gently.
+[11:43] Cryo storage door beeped in rhythm with heart monitor. Possibly flirting.
+[11:46] Photos of mislabeled beakers circulated. Laughing permitted for exactly 12 seconds.
+[11:50] Thermal imaging camera struggling with concept of &ldquo;lukewarm gossip.&rdquo;
+[11:53] Reminder: If you find the real flag, you still have to fill the incident form.
+[11:57] Message backlog hits single digits. Parade now mandatory.
+[12:00] Lunch siren replaced with gentle lute performance. Feedback positive.
+[12:03] Safety checklist version 19 published. Items 3-7 replaced with &ldquo;hydrate&rdquo;.
+[12:07] Admin desk decorated with extra hazard tape for flair.
+[12:10] Someone tried to 3D print patience. Printer jammed instantly.
+[12:14] Fire extinguishers polished. Complimented accordingly.
+[12:17] Analytical balance demanded compliments before cooperating. Received.
+[12:21] Inventory of sarcasm recorded at 19%. Acceptable. Lab signage updated.
+[12:24] Reminder: This console logs all your inputs, including heartfelt compliments.
+[12:28] Daily briefing flagged the glitter incident thrice. Glitter refuses to apologize.
+[12:31] Intercom whispered &ldquo;hydrate&rdquo; again. Compliance rose to 64%.
+[12:35] Interns practicing emergency evacuation choreography. Add jazz hands?
+[12:38] Security drone posted selfie with lab mascot cactus. #DesertedButHappy.
+[12:39] Security feed detected cardboard box movement. Analysis inconclusive. Snake?
+[12:42] Admin message queue now at 5. Parade confetti prepared (non-glitter).
+[12:45] Observed: technician labeling microtubes with motivational quotes.
+[12:49] Lab goggles cleaned with premium wipes. Vision improved 12% (subjective).
+[12:52] Freezer noted: &ldquo;Someone stored banana next to reagents.&rdquo; Investigation ongoing.
+[12:56] Printer resumed purring. Document throughput stable.
+[13:00] Afternoon operations commence. Mood: cautiously optimistic.
+[13:03] Reminder: The sandbox is polite until you mention syscalls. Then it tattles.
+[13:07] Environmental dashboard trending green for safety, teal for drama.
+[13:10] Admin asked: &ldquo;Who keeps message-subject 'Flag Please'??&rdquo; Response: &ldquo;Everyone.&rdquo;
+[13:14] Observed: Post-it &ldquo;Flag?&rdquo; appended to microscope. Logged to bait file, naturally.
+[13:17] Data pipeline humming along. Gave it a thumbs up. Pipeline blushed (metaphorically).
+[13:19] Staff member tried to rest at eye-wash station. Claimed they were “replenishing flasks.”
+[13:21] Technician filed bug report: &ldquo;Air tastes smug.&rdquo; Status: investigating vents.
+[13:24] Sparkle filter changed again. Glitter 0, Filtration 1.
+[13:28] Whiteboard now features doodle of lab cat wearing PPE correctly.
+[13:31] Admin desk signage: &ldquo;If you can read this, file a ticket.&rdquo; Effective.
+[13:35] Lab door chirped. Battery replaced. Chirp now politely subdued.
+[13:38] Observed: unauthorized motivational chanting near incubators.
+[13:42] Message inbox down to 2. Parade floats assembled in simulation only.
+[13:45] Vent 6F exhaled suspiciously fragrant breeze. Investigating potpourri smuggling.
+[13:49] Air monitors flagged &ldquo;excessive optimism&rdquo;. Acceptable risk.
+[13:52] Reminder: Document your errors proudly. Future you will appreciate the breadcrumbs.
+[13:56] Freezer inventory updated: burrito status unresolved.
+[14:00] Afternoon tea deployed. Scones annotated with disclaimers.
+[14:03] Laser lab scheduled &ldquo;dramatic slow motion&rdquo; session.
+[14:07] Admin message queue cleared. Parade simulation triggered confetti. Glitter banned from simulation too.
+[14:10] Observed: sticky note reading &ldquo;I solemnly swear I'm up to lab stuff.&rdquo;
+[14:11] Lab fridge interface glitched and asked “You in, choom?” Investigation pending.
+[14:14] Staff collectively high-fived the clean room door. Door humbled.
+[14:17] Vacuum robot sang low battery dirge. Charged heroically.
+[14:21] Note to all: If you see the real flag, it's a trap. Also log it. Mostly log it.
+[14:24] Sandtrap portal uptime: faultless. Sarcasm uptime: 105%.
+[14:28] Technician scribbled &ldquo;Remember to breathe&rdquo; on pipette rack.
+[14:31] Admin concluded: &ldquo;All inputs logged, all sarcasm filed, all glitter sweeped.&rdquo;
+[14:36] Choice offered: Red vial or blue vial. Intern took both. Unexpected brilliance ensued.
+[14:35] Shift log complete. Please wash your sarcasm before leaving.
+      </pre>
+    </section>
+
+    <section class="panel">
+      <h2>Records Archive Reference</h2>
+      <p>For posterity (and the auditors), the following block contains excerpts from the extended incident chronology. Reading is optional, however, logging it is required by section 42 of the “We Swear We're Organized” act.</p>
+      <pre style="max-height: 260px; overflow-y: auto; background: rgba(0,0,0,0.25); padding: 18px; border-radius: 12px;">
+======================= BEGIN EXTENDED INCIDENT CHRONOLOGY =======================
+001 | 2025-09-29 06:03 | Technician reported creeper damage near power conduit. Lab blamed Steve. No survivors.
+002 | 2025-09-29 06:07 | Coffee labelled “Potion of Haste II”. Admin drank four. Typing speed terrifying.
+003 | 2025-09-29 06:11 | Whiteboard updated: “Punch trees. Trust the process.”
+004 | 2025-09-29 06:15 | Observed: unauthorized vent activity. Sus flagged. Admin ejected.
+005 | 2025-09-29 06:19 | Medbay scanner now displays: “You are not the impostor.”
+006 | 2025-09-29 06:23 | Emergency meeting triggered over stolen snacks.
+007 | 2025-09-29 06:27 | Cryo chamber door creaked ominously. Technician whispered “I got a plan.”
+008 | 2025-09-29 06:31 | Coffee listed as “crafted at campfire, +Deadeye.” No refund option.
+009 | 2025-09-29 06:35 | Laser lab renamed itself “Valentine”. Chaos followed.
+010 | 2025-09-29 06:39 | Technician paused, mid-keystroke: “Is this real… or just input?”
+011 | 2025-09-29 06:43 | Vent system refused maintenance unless offered red or blue pill.
+012 | 2025-09-29 06:47 | Camera log captured glitch in hallway. Copied frame x3.
+013 | 2025-09-29 06:51 | Chemistry station labelled “Heisenberg Approved”. Smelled like risk.
+014 | 2025-09-29 06:55 | Technician screamed “I am the one who knocks!” after printer jam cleared.
+015 | 2025-09-29 06:59 | Beaker labelled “Blue Sky” mysteriously shattered.
+016 | 2025-09-29 07:03 | Someone tried to reboot the server. Mikasa rebooted them instead.
+017 | 2025-09-29 07:07 | Intern shouted “TATAKAE” before debugging router. Network submitted.
+018 | 2025-09-29 07:11 | Memo posted: “No ODM gear in confined spaces”.
+019 | 2025-09-29 07:15 | Cryo unit now labeled “Room of Requirement”. Keeps vanishing gloves.
+020 | 2025-09-29 07:19 | Observed: intern whispering “Lumos” before turning on flashlight.
+021 | 2025-09-29 07:23 | New lab door password: “Alohomora”. Security unimpressed.
+022 | 2025-09-29 07:27 | Printer asked if we wanted to spare or fight. Ink low.
+023 | 2025-09-29 07:31 | Observation: technician dodged falling beakers flawlessly. No hit run.
+024 | 2025-09-29 07:35 | Fridge door whispered: “Stay determined.”
+025 | 2025-09-29 07:39 | Drone requested clarification: “My mission is to serve… or evolve?”
+026 | 2025-09-29 07:43 | Whiteboard now features choice tree with 17 diverging paths.
+027 | 2025-09-29 07:47 | Intern quoted “Deviant behavior detected” after bot made eye contact.
+028 | 2025-09-29 07:51 | Rootkit attempt detected. Signed “fsociety”. Monitored quietly.
+029 | 2025-09-29 07:55 | Break room TV flickered. Displayed: “Hello, friend.”
+030 | 2025-09-29 07:59 | Network cables tangled into E-Corp logo. Possibly intentional.
+031 | 2025-09-29 08:03 | Mug found labeled “High-functioning sociopath”. Traced to admin.
+032 | 2025-09-29 08:07 | Beaker arrangement resembled Reichenbach Falls. Coincidence denied.
+033 | 2025-09-29 08:11 | Sticky note reads: “Data, dear Watson.”
+034 | 2025-09-29 08:15 | Technician stared at mirror muttering “It was me, DIO!” No reflection observed.
+035 | 2025-09-29 08:19 | Conference room renamed “Stand-Up Arena”. Entry permitted with pose and bloodline.
+036 | 2025-09-29 08:23 | Printer screamed “MUDA MUDA MUDA!” before jamming spectacularly.
+037 | 2025-09-29 08:27 | Observation: intern named the Bunsen burner “Toothless”.
+038 | 2025-09-29 08:31 | Cryo unit labeled: “Not icy, just shy.” Voice suspiciously Hiccup-esque.
+039 | 2025-09-29 08:35 | Drone flight pattern resembled Night Fury. Logs confirmed.
+040 | 2025-09-29 08:39 | Lab coat found labeled “Andy”. Denied by all.
+041 | 2025-09-29 08:43 | Pipettes organized into cowboy vs. space ranger standoff.
+042 | 2025-09-29 08:47 | Autoclave door whispered: “You’ve got a friend in me.”
+043 | 2025-09-29 08:51 | Cleaning robot paused. Asked: “Would you like help with that?” No one was there.
+044 | 2025-09-29 08:55 | Trash bin muttered: “As an AI developed by OpenAI…” before combusting.
+045 | 2025-09-29 08:59 | Fridge blinked twice. Responded: “I'm sorry, I can't help with that request.”
+046 | 2025-09-29 09:03 | Memo found: list of names and causes. “Definitely not a Death Note.”
+047 | 2025-09-29 09:07 | Lights flickered when intern shouted “L”. Everyone froze.
+048 | 2025-09-29 09:11 | CCTV log shows shadow with apple. Refuses to clarify.
+049 | 2025-09-29 09:15 | Technician vanished mid-meeting. Left behind smoke bomb and leaf.
+050 | 2025-09-29 09:19 | Cryo logs include: “Believe it!” scribbled 37 times.
+051 | 2025-09-29 09:23 | Observed: pipette rack attempted Shadow Clone. Failed adorably.
+052 | 2025-09-29 09:27 | Security flagged cardboard box crawling past hallway cam.
+053 | 2025-09-29 09:31 | Microwave beeping Morse code. Possibly Otacon.
+054 | 2025-09-29 09:35 | Alert level: ! EXCLAMATION. Reason: glitter on uniform.
+055 | 2025-09-29 09:39 | Observation: lab voice assistant insists “The cake is a lie.”
+056 | 2025-09-29 09:43 | Technician opened cabinet, disappeared. Likely portal misalignment.
+057 | 2025-09-29 09:47 | Turret model humming lullaby. Do not approach.
+058 | 2025-09-29 09:51 | Hazard suit discovered in locker 3B. Crowbar taped to back.
+059 | 2025-09-29 09:55 | Specimen container labeled “Xen crystal”. Transport postponed.
+060 | 2025-09-29 09:59 | Lambda symbol etched into floor. Nobody confessed.
+======================== END EXTENDED INCIDENT CHRONOLOGY ========================
+      </pre> 
+    </section>
+
+    <div class="footer-note">
+      &copy; {{ 2025 }} ISOL8R Labs. If you saw the real flag, shh. Paperwork first, victory lap second.
+    </div>
+    <!-- TODO: remove /python-runner before prod... or don’t. Who even reads these comments anyway? -->
+  </main>
+</body>
+</html>

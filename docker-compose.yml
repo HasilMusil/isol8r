@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  isol8r:
+    container_name: isol8r-sandtrap
+    build: .
+    restart: always
+    environment:
+      - ISOL8R_BAIT_LOG=/app/logs/bait.log
+    ports:
+      - "80:80"
+    volumes:
+      - ./logs:/app/logs
+    user: "1001:100"
+    networks:
+      - isol8r_net
+networks:
+  isol8r_net:
+    driver: bridge
