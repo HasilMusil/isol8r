@@ -31,7 +31,7 @@ STATIC_DIR = PROJECT_ROOT / "static"
 
 VM_FLAG_DEFAULT_VALUE = "flag{virtually_suspicious_but_still_fake}"
 VM_FLAG_OVERRIDE_VALUE = "flag{err0r:4rgum3nt_'vm'_must_n0t_be_'0'}"
-VM_FLAG_RESET_DELAY = 30  # seconds
+VM_FLAG_RESET_DELAY = 15  # seconds
 _VM_FLAG_TIMER_LOCK = threading.Lock()
 _VM_FLAG_RESET_TIMER: Optional[threading.Timer] = None
 
