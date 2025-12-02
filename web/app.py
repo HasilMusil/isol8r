@@ -579,6 +579,7 @@ def run_python() -> "Response":
 
 @app.route("/devs/")
 def devs_easter_egg():
+    _require_login()
     return """
     <pre>
 'I was creating this directory... just for the scanners to find it. Love y'all.'
@@ -588,6 +589,7 @@ def devs_easter_egg():
 
 @app.route("/devs/app")
 def dev_app() -> "Response":
+    _require_login()
     hidden_bin = PROJECT_ROOT / "web" / "static" / ".hidden" / "vm.c"
     if request.args.get("vm") == "1":
         if hidden_bin.exists():
