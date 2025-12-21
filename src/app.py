@@ -19,15 +19,15 @@ from typing import Dict, List, Optional
 from flask import Flask, abort, flash, jsonify, redirect, render_template, request, send_file, session, url_for, Response
 from jinja2 import ChoiceLoader, FileSystemLoader
 
-from web.utils import jail_sandbox
+from src.utils import jail_sandbox
 
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BASE_DIR.parent
 LOG_PATH = PROJECT_ROOT / "logs" / "bait.log"
 DATA_DIR = PROJECT_ROOT / "data"
 FAKE_FLAGS_DIR = DATA_DIR / "fake_flags"
-ADDITIONAL_TEMPLATE_DIR = PROJECT_ROOT / "templates"
-STATIC_DIR = PROJECT_ROOT / "static"
+ADDITIONAL_TEMPLATE_DIR = BASE_DIR / "templates"
+STATIC_DIR = BASE_DIR / "static"
 
 VM_FLAG_DEFAULT_VALUE = "flag{virtually_suspicious_but_still_fake}"
 VM_FLAG_OVERRIDE_VALUE = "flag{err0r:4rgum3nt_'vm'_must_n0t_be_'0'}"
@@ -523,14 +523,6 @@ def message_admin() -> str:
     return redirect(url_for("index"))
 
 
-@app.route("/teapot", methods=["GET"])
-def teapot_hint() -> tuple[str, int, Dict[str, str]]:
-    _record_event(f"/teapot hint ping ip={_client_ip()}")
-    body = "I'm a teapot. No debug info for you. But maybe I can give you the second piece: 'hazmat'. Give a \"message\" to admin."
-    headers = {"X-Hint-Level": "Medium"}
-    return body, 418, headers
-
-
 @app.route("/fake-flags", methods=["GET"])
 def fake_flags() -> str:
     _require_login()
@@ -590,7 +582,7 @@ def devs_easter_egg():
 @app.route("/devs/app")
 def dev_app() -> "Response":
     _require_login()
-    hidden_bin = PROJECT_ROOT / "web" / "static" / ".hidden" / "vm.c"
+    hidden_bin = BASE_DIR / "static" / ".hidden" / "vm.c"
     if request.args.get("vm") == "1":
         if hidden_bin.exists():
             return send_file(hidden_bin, as_attachment=True)

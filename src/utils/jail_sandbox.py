@@ -15,11 +15,11 @@ import time
 from pathlib import Path
 from typing import Dict, Optional
 
-from core.pyjail.pyjail import JailViolation, PythonJail
+from src.core.pyjail.pyjail import JailViolation, PythonJail
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOG_PATH = BASE_DIR.parent / "logs" / "bait.log"
-SANDBOX_BINARY = BASE_DIR.parent / "core" / "jail_binaries" / "sandboxed_echo"
+SANDBOX_BINARY = BASE_DIR / "core" / "jail_binaries" / "sandboxed_echo"
 _PYJAIL = PythonJail()
 
 logging.basicConfig(level=logging.INFO)

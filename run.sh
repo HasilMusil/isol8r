@@ -241,12 +241,12 @@ find "${PROJECT_ROOT}" -type f -name "*.sh" -exec chmod +x {} +
 find "${PROJECT_ROOT}" -type f -name "*.py" -exec chmod +x {} +
 find "${PROJECT_ROOT}" -type f -name "*.c" -exec chmod 0644 {} +
 
-if [[ -f "${PROJECT_ROOT}/core/pwnables/tiny_vmmgr" ]]; then
-    chmod 0750 "${PROJECT_ROOT}/core/pwnables/tiny_vmmgr"
+if [[ -f "${PROJECT_ROOT}/src/core/pwnables/tiny_vmmgr" ]]; then
+    chmod 0750 "${PROJECT_ROOT}/src/core/pwnables/tiny_vmmgr"
 fi
 
-if [[ -f "${PROJECT_ROOT}/core/jail_binaries/sandboxed_echo" ]]; then
-    chmod 0750 "${PROJECT_ROOT}/core/jail_binaries/sandboxed_echo"
+if [[ -f "${PROJECT_ROOT}/src/core/jail_binaries/sandboxed_echo" ]]; then
+    chmod 0750 "${PROJECT_ROOT}/src/core/jail_binaries/sandboxed_echo"
 fi
 
 if ! getent group ctf >/dev/null 2>&1; then
@@ -260,8 +260,7 @@ if [[ -f "${PROJECT_ROOT}/data/real_flag.txt" ]]; then
     log "Set ownership on data/real_flag.txt to root:ctf with 0640 permissions."
 fi
 
-ln -snf "${PROJECT_ROOT}/web/templates/index.html" "${PROJECT_ROOT}/templates/index.html"
-log "Symlinked templates/index.html -> web/templates/index.html"
+
 
 log "Validating cron script permissions."
 chmod +x "${PROJECT_ROOT}/cron/cleanup_logs.sh"

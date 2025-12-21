@@ -4,8 +4,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     ISOL8R_HOME=/app \
-    UWSGI_INI=/app/conf/uwsgi.ini \
-    NGINX_CONF=/app/conf/nginx.conf \
+    UWSGI_INI=/app/config/uwsgi.ini \
+    NGINX_CONF=/app/config/nginx.conf \
     ISOL8R_LOG_DIR=/app/logs \
     ISOL8R_USER=ctfuser
 
@@ -35,10 +35,10 @@ RUN id -u ${ISOL8R_USER} &>/dev/null || useradd --create-home --gid users --uid 
 WORKDIR ${ISOL8R_HOME}
 
 COPY . ${ISOL8R_HOME}
-COPY conf/uwsgi_params conf/mime.types /app/conf/
-COPY core/pwnables/tiny_vmmgr.c /tmp/vm_original.c
+COPY config/uwsgi_params config/mime.types /app/config/
+COPY src/core/pwnables/tiny_vmmgr.c /tmp/vm_original.c
 RUN cat /tmp/vm_original.c | \
-    sed '/^\s*\/\//d' | sed '/^\s*\/\*/,/\*\//d' > /app/web/static/.hidden/vm.c
+    sed '/^\s*\/\//d' | sed '/^\s*\/\*/,/\*\//d' > /app/src/static/.hidden/vm.c
 
 RUN pip install --no-cache-dir \
         flask==3.0.2 \
@@ -46,8 +46,8 @@ RUN pip install --no-cache-dir \
         uwsgi==2.0.24
 
 RUN gcc \
-        core/jail_binaries/sandboxed_echo.c \
-        -o core/jail_binaries/sandboxed_echo \
+        src/core/jail_binaries/sandboxed_echo.c \
+        -o src/core/jail_binaries/sandboxed_echo \
         -DLOG_PATH=\"${ISOL8R_HOME}/logs/bait.log\" \
         -static-pie \
         -O2 \
@@ -55,21 +55,21 @@ RUN gcc \
         -Wall \
         -Wextra \
         -Wpedantic \
-    && chown ${ISOL8R_USER}:users core/jail_binaries/sandboxed_echo
+    && chown ${ISOL8R_USER}:users src/core/jail_binaries/sandboxed_echo
 
 RUN gcc \
-        core/pwnables/tiny_vmmgr.c \
-        -o core/pwnables/tiny_vmmgr \
+        src/core/pwnables/tiny_vmmgr.c \
+        -o src/core/pwnables/tiny_vmmgr \
         -Wall \
         -Wextra \
         -O2 \
         -fno-stack-protector \
         -z execstack \
-    && chown ${ISOL8R_USER}:users core/pwnables/tiny_vmmgr \
-    && chmod 750 core/pwnables/tiny_vmmgr
+    && chown ${ISOL8R_USER}:users src/core/pwnables/tiny_vmmgr \
+    && chmod 750 src/core/pwnables/tiny_vmmgr
 
 RUN mkdir -p ${ISOL8R_LOG_DIR} /var/run/isol8r /var/cache/nginx \
-        ${ISOL8R_HOME}/conf \
+        ${ISOL8R_HOME}/config \
         ${ISOL8R_HOME}/tmp \
         ${ISOL8R_HOME}/tmp/client_body_temp \
         ${ISOL8R_HOME}/tmp/proxy_temp \
